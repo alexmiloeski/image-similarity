@@ -11,7 +11,13 @@ MODEL_NAME = "openai/clip-vit-large-patch14"
 ###
 
 def load_base_embeddings():
-    return None
+    try:
+        # try to load the base embeddings from file
+        return torch.load(BASE_EMBEDDINGS_PATH, weights_only=True)
+    except (FileNotFoundError) as e:
+        # if file doesn't exist or contains invalid data, return None
+        print(f"Failed to load embeddings from file.")
+        return None
 
 ###
 
