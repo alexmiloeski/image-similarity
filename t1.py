@@ -33,7 +33,20 @@ model = CLIPModel.from_pretrained(MODEL_NAME)
 processor = CLIPProcessor.from_pretrained(MODEL_NAME)
 
 base_embeddings = load_base_embeddings()
-print("Creating new base embeddings...")
+if base_embeddings is None:
+    # if the base embeddings don't exist or are invalid, process the base image and save to file
+    print("Creating new base embeddings...")
+    base_image = Image.open(BASE_IMAGE_PATH)
+    base_inputs = processor(images=base_image, return_tensors="pt", padding=True)
+
+    with torch.no_grad():
+        base_embeddings = model.get_image_features(**base_inputs)
+
+    torch.save(base_embeddings, BASE_EMBEDDINGS_PATH)
+    print("Created new base embeddings.")
+else:
+    print("Loaded saved base embeddings.")
+print(f"Base embeddings shape: {base_embeddings.shape}")
 
 ###
 
